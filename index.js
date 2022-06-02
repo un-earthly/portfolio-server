@@ -2,7 +2,7 @@ import express from "express"
 import dotenv from "dotenv"
 dotenv.config()
 import cors from "cors"
-import Mongodb from "mongodb"
+import Mongodb, { ObjectId } from "mongodb"
 const { MongoClient, ServerApiVersion } = Mongodb;
 const app = express()
 const port = 80 || process.env.PORT
@@ -15,14 +15,38 @@ async function run() {
     try {
         client.connect()
         const messageCollection = client.db("user").collection("message");
+        const skillCollection = client.db("adm").collection("skill");
+        const projectCollection = client.db("adm").collection("project");
 
+        app.get("/message", async (req, res) => {
+            res.send(await messageCollection.find().toArray())
+        })
         app.post("/message", async (req, res) => {
             res.send(await messageCollection.insertOne(req.body))
+        })
+        app.patch("/message/:id", async (req, res) => {
+            const updateDoc = { $set: { status: "replied" } }
+            res.send(await messageCollection.updateOne({ _id: ObjectId(req.params.id) }, updateDoc))
+        })
+        app.delete("/message/:id", async (req, res) => {
+            res.send(await messageCollection.deleteOne({ _id: ObjectId(req.params.id) }))
+        })
+        app.get("/skill", async (req, res) => {
+            res.send(await skillCollection.find().toArray())
+        })
+        app.post("/skill", async (req, res) => {
+            res.send(await skillCollection.insertOne(req.body))
+        })
+        app.get("/project", async (req, res) => {
+            res.send(await projectCollection.find().toArray())
+        })
+        app.post("/project", async (req, res) => {
+            res.send(await projectCollection.insertOne(req.body))
         })
 
 
     } finally {
-        await client.close();
+
     }
 }
 run().catch(console.dir);
