@@ -1,9 +1,8 @@
-import express from "express"
-import dotenv from "dotenv"
-dotenv.config()
-import cors from "cors"
-import Mongodb, { ObjectId } from "mongodb"
-const { MongoClient, ServerApiVersion } = Mongodb;
+const express = require("express")
+require("dotenv").config()
+const cors = require("cors")
+const { Mongodb, ObjectId } = require("mongodb")
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const app = express()
 const port = 80 || process.env.PORT
 
@@ -25,7 +24,12 @@ async function run() {
             res.send(await messageCollection.insertOne(req.body))
         })
         app.patch("/message/:id", async (req, res) => {
-            const updateDoc = { $set: { status: "replied" } }
+            const updateDoc = {
+                $set:
+                {
+                    status: "replied"
+                }
+            }
             res.send(await messageCollection.updateOne({ _id: ObjectId(req.params.id) }, updateDoc))
         })
         app.delete("/message/:id", async (req, res) => {
