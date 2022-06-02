@@ -1,13 +1,12 @@
-const express = require("express")
-require("dotenv").config()
-const cors = require("cors")
-const { ObjectId } = require("mongodb")
-const { MongoClient, ServerApiVersion } = require("mongodb");
-const app = express()
-const port = 8080 || process.env.PORT
+const express = require('express');
+const cors = require('cors');
+require('dotenv').config();
+const app = express();
+const port = process.env.PORT || 80;
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.MONGO__ADMIN}:${process.env.MONGO__PASS}@cluster0.ha0ln.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-console.log(uri)
+
 app.use(cors())
 app.use(express.json())
 async function run() {
