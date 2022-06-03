@@ -40,6 +40,19 @@ async function run() {
         app.post("/skill", async (req, res) => {
             res.send(await skillCollection.insertOne(req.body))
         })
+        app.delete("/skill/:id", async (req, res) => {
+            res.send(await skillCollection.deleteOne({ _id: ObjectId(req.params.id) }))
+        })
+        app.patch("/skill/:id", async (req, res) => {
+            // const updateDoc = {
+            //     $set:
+            //     {
+            //         status: "replied"
+            //     }
+            // }
+            // res.send(await messageCollection.updateOne({ _id: ObjectId(req.params.id) }, updateDoc))
+            console.log(req.body)
+        })
         app.get("/project", async (req, res) => {
             res.send(await projectCollection.find().toArray())
         })
