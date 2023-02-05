@@ -3,71 +3,24 @@ const cors = require('cors');
 require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 80;
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const uri = `mongodb+srv://${process.env.MONGO__ADMIN}:${process.env.MONGO__PASS}@cluster0.ha0ln.mongodb.net/?retryWrites=true&w=majority`;
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+const projectRoutes = require("./routes/project.route")
+const messageRoutes = require("./routes/message.route")
+const skillRoutes = require("./routes/skill.route");
+const { connectToDb } = require('./db');
 
 app.use(cors())
 app.use(express.json())
-async function run() {
-    try {
-        client.connect()
-        const messageCollection = client.db("user").collection("message");
-        const skillCollection = client.db("adm").collection("skill");
-        const projectCollection = client.db("adm").collection("project");
-
-        app.get("/message", async (req, res) => {
-            res.send(await messageCollection.find().toArray())
-        })
-        app.post("/message", async (req, res) => {
-            res.send(await messageCollection.insertOne(req.body))
-        })
-        app.patch("/message/:id", async (req, res) => {
-            const updateDoc = {
-                $set:
-                {
-                    status: "replied"
-                }
-            }
-            res.send(await messageCollection.updateOne({ _id: ObjectId(req.params.id) }, updateDoc))
-        })
-        app.delete("/message/:id", async (req, res) => {
-            res.send(await messageCollection.deleteOne({ _id: ObjectId(req.params.id) }))
-        })
-        app.get("/skill", async (req, res) => {
-            res.send(await skillCollection.find().toArray())
-        })
-        app.post("/skill", async (req, res) => {
-            res.send(await skillCollection.insertOne(req.body))
-        })
-        app.delete("/skill/:id", async (req, res) => {
-            res.send(await skillCollection.deleteOne({ _id: ObjectId(req.params.id) }))
-        })
-        app.patch("/skill/:id", async (req, res) => {
-            // const updateDoc = {
-            //     $set:
-            //     {
-            //         status: "replied"
-            //     }
-            // }
-            // res.send(await messageCollection.updateOne({ _id: ObjectId(req.params.id) }, updateDoc))
-            console.log(req.body)
-        })
-        app.get("/project", async (req, res) => {
-            res.send(await projectCollection.find().toArray())
-        })
-        app.post("/project", async (req, res) => {
-            res.send(await projectCollection.insertOne(req.body))
-        })
 
 
-    } finally {
+app.use("/api/v1/project", projectRoutes)
+app.use("/api/v1/message", messageRoutes)
+app.use("/api/v1/skill", skillRoutes)
 
-    }
-}
-run().catch(console.dir);
+
+connectToDb()
+
 app.get("/", (req, res) => {
-    res.send("portfolio server is up n running")
+    res.send("portfolio server is running")
 })
 
 app.listen(port)
