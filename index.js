@@ -23,4 +23,4 @@ app.get("/", (req, res) => {
     res.send("portfolio server is running")
 })
 
-app.listen(port)
+app.listen(port, () => console.log("in port " + port))
