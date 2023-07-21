@@ -1,26 +1,26 @@
 import { IProject } from "./project.interface";
 import { ProjectModel } from "./project.model";
 
-export const getAllProjects = async (): Promise<IProject[]> => {
+export const getAllProjectsService = async (): Promise<IProject[]> => {
     return ProjectModel.find();
 };
 
-export const createProject = async (projectData: Partial<IProject>): Promise<IProject> => {
+export const createProjectService = async (projectData: Partial<IProject>): Promise<IProject> => {
     const newProject = new ProjectModel(projectData);
     return newProject.save();
 };
 
-export const getProjectById = async (projectId: string): Promise<IProject | null> => {
+export const getProjectByIdService = async (projectId: string): Promise<IProject | null> => {
     return ProjectModel.findById(projectId);
 };
 
-export const updateProjectById = async (
+export const updateProjectByIdService = async (
     projectId: string,
     updatedData: Partial<IProject>
 ): Promise<IProject | null> => {
     return ProjectModel.findByIdAndUpdate(projectId, updatedData, { new: true });
 };
 
-export const deleteProjectById = async (projectId: string): Promise<IProject | null> => {
+export const deleteProjectByIdService = async (projectId: string): Promise<IProject | null> => {
     return ProjectModel.findByIdAndDelete(projectId);
 };

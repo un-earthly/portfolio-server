@@ -2,6 +2,8 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import { config } from 'dotenv';
+import router from './app/router';
+import globalErrorHandler from './app/middlewares/globalErrorHandler';
 config();
 
 const app = express();
@@ -11,16 +13,15 @@ app.use(cors());
 app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.MONGO__ADMIN}:${process.env.MONGO__PASS}@cluster0.ha0ln.mongodb.net/?retryWrites=true&w=majority`;
+mongoose.connect(uri)
+    .then(() => console.log("connected"))
+    .catch(err => console.log(err))
 
-(async () => {
-    try {
-        await mongoose.connect(uri);
-        console.log('Connected to MongoDB!');
-    } catch (error) {
-        console.error('Error connecting to MongoDB:', error);
-        process.exit(1);
-    }
-})();
+
+
+app.use("/api/v2", router)
+
+app.use(globalErrorHandler)
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Portfolio server is running');
