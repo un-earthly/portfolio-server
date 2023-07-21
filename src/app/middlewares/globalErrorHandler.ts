@@ -10,7 +10,6 @@ const globalErrorHandler: ErrorRequestHandler = (
     res: Response,
     next: NextFunction
 ) => {
-    console.log(`🐱‍🏍 globalErrorHandler ~~`, { error })
 
     let statusCode = 500;
     let message = 'Something went wrong !';
@@ -49,12 +48,7 @@ const globalErrorHandler: ErrorRequestHandler = (
             : [];
     }
 
-    res.status(statusCode).json({
-        success: false,
-        message,
-        errorMessages,
-        stack: config.env !== 'production' ? error?.stack : undefined,
-    });
+    
 };
 
 export default globalErrorHandler;
