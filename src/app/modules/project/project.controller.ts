@@ -1,13 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { IProject } from './project.interface';
+import fs from 'fs';
 import catchAsync from '../../../utility/catchAsync';
 import sendResponse from '../../../utility/sendResponse';
 import { StatusCodes } from 'http-status-codes';
 import ApiError from '../../../errors/ApiError';
 import { createProjectService, deleteProjectByIdService, getAllProjectsService, getProjectByIdService, updateProjectByIdService } from './project.service';
-import multer from 'multer';
-import { v4 as uuidv4 } from 'uuid';
-import path from 'path';
 
 export const getAllProjects = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const projects = getAllProjectsService()
@@ -20,46 +17,26 @@ export const getAllProjects = catchAsync(async (req: Request, res: Response, nex
     });
 });
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '../uploads'));
-    },
-    filename: function (req, file, cb) {
-        const uniqueFileName = uuidv4() + path.extname(file.originalname);
-        cb(null, uniqueFileName);
-    },
-});
+export const createProject = async (req: Request, res: Response) => {
+    const imageFileName = req.file?.filename;
+    req.body.image = `localhost/uploads/${imageFileName}`;
+    console.log(req.body.image);
 
-const upload = multer({ storage: storage }).single('image');
+    const project = await createProjectService(req.body);
 
-export const createProject = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    upload(req, res, async (err: any) => {
-        if (err) {
-            return sendResponse(res, {
-                statusCode: StatusCodes.BAD_REQUEST,
-                success: false,
-                message: 'Error uploading image',
-            });
-        }
+    if (!project && req.file) {
+        fs.unlinkSync(req.file.path);
 
-        const imageFileName = 'uniqueFileName.jpg';
+        throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Couldnt create project")
 
-        const imageURL = `localhost/uploads/${imageFileName}`;
-
-
-        const newProjectData: IProject = {
-            ...req.body,
-            image: imageURL,
-        };
-        const newProject = await createProjectService(newProjectData);
-        sendResponse(res, {
-            statusCode: StatusCodes.OK,
-            success: true,
-            data: newProject,
-            message: 'Project Created Successfully'
-        })
+    }
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        data: project,
+        message: 'Project Created Successfully'
     });
-});
+};
 
 
 export const getProjectById = catchAsync(async (req: Request, res: Response, next: NextFunction) => {

@@ -105,7 +105,8 @@ My Portfolio API is a RESTful API that serves data for the portfolio application
 
     jsonCopy code
 
-    ```{
+    ```
+    {
       "title": "Project Title",
       "description": "Project description",
       "image": "image_url.png",
